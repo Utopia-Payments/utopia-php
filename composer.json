@@ -4,7 +4,7 @@
     "type": "library",
     "license": "MIT",
     "keywords": ["utopia", "payments", "checkout", "subscriptions", "webhooks", "api"],
-    "homepage": "https://utopia-payments.com/docs/api",
+    "homepage": "https://utopia-payments.com/docs/",
     "require": {
         "php": ">=8.1",
         "ext-curl": "*",

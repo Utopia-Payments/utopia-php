@@ -1,7 +1,7 @@
 # Utopia Payments for PHP
 
 The official PHP library for the
-[Utopia Payments API](https://utopia-payments.com/docs/api): hosted checkout,
+[Utopia Payments API](https://utopia-payments.com/docs/): hosted checkout,
 subscriptions with automatic renewals, and signed webhooks.
 
 - PHP 8.1+, cURL, no other dependencies
