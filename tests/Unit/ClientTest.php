@@ -95,6 +95,21 @@ final class ClientTest extends TestCase
         new Utopia('pk_live_publishable');
     }
 
+    public function testRejectsABaseUrlWithoutTls(): void
+    {
+        $this->expectException(UtopiaException::class);
+        $this->expectExceptionMessage('https://');
+        new Utopia(self::KEY, ['base_url' => 'http://api.example.com/api/v1']);
+    }
+
+    public function testAllowsPlainHttpForThisMachineOnly(): void
+    {
+        foreach (['http://localhost:4010/api/v1', 'http://127.0.0.1:4010/api/v1', 'http://[::1]:4010/api/v1'] as $baseUrl) {
+            new Utopia(self::KEY, ['base_url' => $baseUrl]);
+        }
+        $this->addToAssertionCount(1);
+    }
+
     public function testTellsLiveKeysFromTestKeys(): void
     {
         self::assertTrue((new Utopia('sk_live_abc'))->isLivemode());

@@ -54,7 +54,15 @@ final class Utopia
         if (!preg_match('/^sk_(live|test)_/', $apiKey)) {
             throw new UtopiaException('Pass your secret API key (sk_live_… or sk_test_…).', 'MISSING_API_KEY');
         }
-        $this->baseUrl = rtrim($options['base_url'] ?? self::DEFAULT_BASE_URL, '/');
+        $baseUrl = rtrim($options['base_url'] ?? self::DEFAULT_BASE_URL, '/');
+        // The key travels in a header, so the API is only ever called over
+        // TLS. Plain http is allowed for a sandbox on this machine alone.
+        $scheme = strtolower((string) parse_url($baseUrl, PHP_URL_SCHEME));
+        $host = strtolower((string) parse_url($baseUrl, PHP_URL_HOST));
+        if ($scheme !== 'https' && !($scheme === 'http' && in_array($host, ['localhost', '127.0.0.1', '[::1]'], true))) {
+            throw new UtopiaException('base_url must use https:// (http:// is only allowed for localhost).', 'INVALID_BASE_URL');
+        }
+        $this->baseUrl = $baseUrl;
         $this->timeout = $options['timeout'] ?? 30;
         $this->maxRetries = $options['max_retries'] ?? 2;
 
