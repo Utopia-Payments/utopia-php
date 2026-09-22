@@ -13,8 +13,11 @@ subscriptions with automatic renewals, and signed webhooks.
 ## Install
 
 ```bash
-composer require utopia-payments/utopia-php
+composer config repositories.utopia vcs https://github.com/Utopia-Payments/utopia-php
+composer require utopia-payments/utopia-php:^0.1
 ```
+
+The repository line is required until the package is submitted to Packagist.
 
 ## Quick start
 
