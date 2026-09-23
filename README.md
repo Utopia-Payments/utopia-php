@@ -92,22 +92,35 @@ if ($event['type'] === 'payment.succeeded') {
 http_response_code(204);
 ```
 
-Laravel:
+Laravel, in `routes/api.php` (a POST in `routes/web.php` is rejected by CSRF
+verification before it reaches your handler):
 
 ```php
+use Illuminate\Http\Request;
+use Utopia\Exception\WebhookVerificationException;
+use Utopia\Webhook;
+
 Route::post('/webhooks/utopia', function (Request $request) {
-    $event = \Utopia\Webhook::verify(
-        $request->getContent(),
-        $request->headers->all(),
-        config('services.utopia.webhook_secret'),
-    );
+    try {
+        $event = Webhook::verify(
+            $request->getContent(),
+            $request->headers->all(),
+            config('services.utopia.webhook_secret'),
+        );
+    } catch (WebhookVerificationException $e) {
+        return response()->noContent(400);
+    }
+
     // …
     return response()->noContent();
 });
 ```
 
-Deliveries retry for about a day until you answer with a 2xx. Use
-`$event['id']` to ignore duplicates.
+`Webhook::verify()` accepts a delivery whose `webhook-timestamp` is within 300
+seconds of now; pass a fourth argument to change that window.
+
+A delivery is attempted eight times over about 28 hours until you answer with a
+2xx, then abandoned. Use `$event['id']` to ignore duplicates.
 
 ## Lists
 
@@ -148,3 +161,6 @@ new Utopia('sk_live_…', [
     'base_url' => 'https://utopia-payments.com/api/v1',
 ]);
 ```
+
+`$utopia->isLivemode()` returns `true` for an `sk_live_` key and `false` for an
+`sk_test_` one.
